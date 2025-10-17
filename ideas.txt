@@ -9,6 +9,12 @@ what should we do?
     how do we recursively search all the folders of the file and skip the unembeddable files.
 
 
+1.5 Figure out ChromaDB
+
+    1.5.1
+    when the user first starts the program, set the 
+
+
 2. Embedding
 
     2.1 
