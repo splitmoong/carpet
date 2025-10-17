@@ -12,7 +12,10 @@ what should we do?
 1.5 Figure out ChromaDB
 
     1.5.1
-    when the user first starts the program, set the 
+    when the user first starts the program, init the ChromaDB to /home/watever_user/chroma_store
+
+    
+
 
 
 2. Embedding
