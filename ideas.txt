@@ -1,0 +1,25 @@
+what should we do?
+
+1. Ingestion
+
+    1.1 
+    our program should be able to accept a folder. (it's going to be run from the terminal).
+
+    1.2 
+    how do we recursively search all the folders of the file and skip the unembeddable files.
+
+
+2. Embedding
+
+    2.1 
+    which approach should we take 
+        - embed the entire file, chunk through it and pass them to the model, get a vector, store
+        (path, text, vector) pairs in the database
+
+        - get a summary from a model. let's say that is dependant on file extention. pdfs, word, excel have higher summary words, photos will have a lower word count and mp3 (we dont even know), then chunk those and store the pair in database
+
+    2.2
+    we will use a local database, but also we shall see the time difference if we load it into memory just when the user is searching for files, vs when they arent or it's embedding then it wont.
+
+3. Searching
+
