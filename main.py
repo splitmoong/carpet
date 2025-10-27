@@ -38,6 +38,11 @@ def main():
         return
 
     if command == "embed":
+
+        #check for ollama installation
+        if not Ollama.start_from_embed():
+            Ollama.start()
+
         cwd = os.getcwd()
         ingestor = Ingestor()
         ingestor.open_folder(cwd)
