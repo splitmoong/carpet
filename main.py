@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 
 from database.setup_chroma_db import setup_chroma
 from ingestion.ingestor import Ingestor
+
+# init or connect to Chroma
+from chromadb import PersistentClient
+
 # from search_db import search_vector_db
 
 load_dotenv()
@@ -13,8 +17,6 @@ load_dotenv()
 HOME = os.path.expanduser("~")
 db_path = os.path.join(HOME, "chroma_store")
 
-# init or connect to Chroma
-from chromadb import PersistentClient
 if not os.path.exists(db_path) or not os.listdir(db_path):
     client = setup_chroma(db_path)
 else:

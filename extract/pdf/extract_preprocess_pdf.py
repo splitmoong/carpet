@@ -1,7 +1,7 @@
-#embedding/pdf/extract_preprocess_pdf.py
 import os
 import re
 from PyPDF2 import PdfReader
+
 
 def extract_text_from_pdf(pdf_path: str) -> str:
     """
@@ -20,6 +20,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
             text += page_text + "\n"
 
     return text
+
 
 def preprocess_pdf_text(raw_text: str) -> str:
     """
@@ -43,11 +44,10 @@ def preprocess_pdf_text(raw_text: str) -> str:
 
     return text.strip()
 
+
 def extract_and_preprocess(pdf_path: str) -> str:
     """
     Convenience function to extract and preprocess PDF text in one step.
     """
     raw_text = extract_text_from_pdf(pdf_path)
     return preprocess_pdf_text(raw_text)
-
-

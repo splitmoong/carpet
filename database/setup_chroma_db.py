@@ -1,6 +1,7 @@
 import os
 from chromadb import PersistentClient
 
+
 def setup_chroma(path: str):
     """Create persistent ChromaDB at `path` if it doesn't exist, and return client + collection."""
     if not os.path.exists(path):
