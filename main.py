@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from database.setup_chroma_db import setup_chroma
 from ingestion.ingestor import Ingestor
+from ollama.ollama import Ollama
 
 # init or connect to Chroma
 from chromadb import PersistentClient
@@ -32,22 +33,27 @@ def main():
 
     command = sys.argv[1].lower()
 
+    if command == "ollama":
+        Ollama.start()
+        return
+
     if command == "embed":
         cwd = os.getcwd()
         ingestor = Ingestor()
         ingestor.open_folder(cwd)
         print(f"Found {len(ingestor.file_paths)} files to embed.")
+        return
 
-    elif command == "search":
+    if command == "search":
         if len(sys.argv) < 3:
             print("Usage: carpet search <query>")
             return
         query = " ".join(sys.argv[2:])
         # results = search_vector_db(query, collection)
         print(f"Searching for: {query}")
+        return
 
-    else:
-        print(f"Unknown command: {command}")
+    print(f"Unknown command: {command}")
 
 
 if __name__ == "__main__":
