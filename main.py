@@ -14,6 +14,13 @@ from chromadb import PersistentClient
 
 load_dotenv()
 
+import logging
+
+# Suppress a noisy Chroma telemetry INFO message coming from the
+# chromadb.telemetry.product.posthog logger. The library still runs
+# telemetry, but this prevents the startup INFO line from printing.
+logging.getLogger("chromadb.telemetry.product.posthog").setLevel(logging.WARNING)
+
 # GLOBAL DB in home directory
 HOME = os.path.expanduser("~")
 db_path = os.path.join(HOME, "chroma_store")
@@ -35,6 +42,10 @@ def main():
 
     if command == "ollama":
         Ollama.start()
+        return
+    
+    if command == "model":
+        Ollama.check_model()
         return
 
     if command == "embed":

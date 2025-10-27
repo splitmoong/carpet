@@ -28,17 +28,23 @@ class Ollama:
 
     @staticmethod
     def check() -> bool:
-        """Return True if the `ollama` executable is available on PATH.
-        Also logs a short message indicating status.
+        """
+        check if ollama exists.
         """
         bin_path = shutil.which("ollama")
         if bin_path:
             try:
-                result = subprocess.run(
-                    [bin_path, "version"], capture_output=True, text=True, check=False
-                )
-                ver = result.stdout.strip() or result.stderr.strip()
-                logger.info("Found ollama at %s. Version/info: %s", bin_path, ver)
+                version_found = False
+                for flag in ("--version", "-v"):
+                    result = subprocess.run(
+                        [bin_path, flag], capture_output=True, text=True, check=False
+                    )
+                    if result.returncode == 0:
+                        version_found = True
+                        break
+
+                if not version_found:
+                    logger.info("Found ollama at %s.", bin_path)
             except Exception as exc:  # pragma: no cover - defensive logging
                 logger.info("Found ollama at %s (could not run version): %s", bin_path, exc)
             return True
@@ -48,14 +54,10 @@ class Ollama:
 
     @staticmethod
     def install_ollama(prompt: bool = True) -> Optional[int]:
-        """Attempt to download and run the official ollama installer.
-
-        If prompt is True the user will be asked to confirm before the
-        installer is executed. Returns the subprocess return code on execution,
-        or None if the install was skipped.
         """
-        # If running on native Windows, don't attempt to run the POSIX shell installer;
-        # instead provide instructions to the user and exit.
+        attempt to download and run the official ollama installer.
+        """
+        # windows cat laughing meme
         if sys.platform == "win32":
             msg = (
                 "Automatic installation is not supported on native Windows by this script.\n"
@@ -104,13 +106,44 @@ class Ollama:
         except Exception as exc:  # pragma: no cover - runtime failures
             logger.exception("Failed to run installer command: %s", exc)
             return None
+        
+
+    @staticmethod
+    def check_model(model: str = "qllama/bge-m3") -> bool:
+        """
+        check if embedding model is present.
+        """
+        bin_path = shutil.which("ollama")
+        if not bin_path:
+            logger.info("Cannot check models because `ollama` is not installed on PATH.")
+            return False
+
+        # try several plausible commands that list models; different versions
+        list_cmds = ["list", "models", "ls"]
+        model_lower = model.lower()
+        short_name = model.split("/")[-1].lower()
+
+        for cmd in list_cmds:
+            try:
+                result = subprocess.run([bin_path, cmd], capture_output=True, text=True, check=False)
+            except Exception as exc:  # pragma: no cover - defensive
+                logger.debug("Failed to run '%s %s': %s", bin_path, cmd, exc)
+                continue
+
+            out = (result.stdout or "") + "\n" + (result.stderr or "")
+            out_lower = out.lower()
+            if model_lower in out_lower or short_name in out_lower:
+                logger.info("Model '%s' appears to be installed (found via '%s').", model, cmd)
+                return True
+
+        logger.info("Model '%s' not found among local ollama models.", model)
+        return False
+
 
     @staticmethod
     def start() -> bool:
-        """Domino starter: check for ollama and attempt installation if missing.
-
-        Returns True if ollama is present or installation completed successfully,
-        False otherwise.
+        """
+        starts the chain of functions.
         """
         present = Ollama.check()
         if present:
