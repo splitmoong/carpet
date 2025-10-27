@@ -1,14 +1,5 @@
-"""Utilities for detecting and installing the `ollama` CLI.
-
-This module provides a simple `Ollama` class with a `check` method that
-verifies whether the `ollama` executable is present on PATH. If it is not
-found the module can run the official installer script to download and
-install `ollama` on Linux/macOS systems.
-
-Notes:
-- For safety the installer will be run only after explicit user confirmation
-  when invoked from the command line. Callers can programmatically disable
-  the prompt by calling `install_ollama(prompt=False)`.
+"""
+Ollama static class to manage ollama and models.
 """
 
 from __future__ import annotations
@@ -137,7 +128,17 @@ class Ollama:
                 return True
 
         logger.info("Model '%s' not found among local ollama models.", model)
-        return False
+
+        try:
+            resp = input(f"Model '{model}' not found. Pull it now? [Y/n]: ")
+        except EOFError:
+            resp = "n"
+
+        if resp.strip().lower() in ("n", "no"):
+            logger.info("User declined to pull model %s.", model)
+            return False
+
+        return bool(Ollama.pull_model(model, prompt=False))
 
 
     @staticmethod
@@ -167,3 +168,40 @@ class Ollama:
             return False
         else:
             return True
+
+    @staticmethod
+    def pull_model(model: str, prompt: bool = True) -> Optional[int]:
+        """Pull a model using `ollama pull <model>`.
+
+        If prompt is True the user may be prompted (caller can pre-prompt).
+        Returns the subprocess return code on execution, or None if skipped.
+        """
+        bin_path = shutil.which("ollama")
+        if not bin_path:
+            logger.error("Cannot pull model because `ollama` is not installed on PATH.")
+            return None
+
+        # If an additional prompt is requested, ask here (default to Yes on Enter).
+        if prompt:
+            try:
+                resp = input(f"Run 'ollama pull {model}' now? [Y/n]: ")
+            except EOFError:
+                resp = "n"
+
+            if resp.strip().lower() in ("n", "no"):
+                logger.info("User cancelled pulling model %s.", model)
+                return None
+
+        cmd = [bin_path, "pull", model]
+        logger.info("Pulling model with command: %s", " ".join(cmd))
+
+        try:
+            proc = subprocess.run(cmd)
+            if proc.returncode == 0:
+                logger.info("Successfully pulled model %s.", model)
+            else:
+                logger.error("Failed to pull model %s (exit code %s).", model, proc.returncode)
+            return proc.returncode
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.exception("Exception while pulling model %s: %s", model, exc)
+            return None
