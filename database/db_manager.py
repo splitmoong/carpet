@@ -74,11 +74,9 @@ class DbManager:
     @staticmethod
     def get_chunks_by_file(filepath: str):
         """
-        Get all chunks for a specific file.
-        
+        get all chunks for a specific file.
         Args:
             filepath: The file path to retrieve chunks for
-            
         Returns:
             dict: Dictionary with ids, documents, metadatas, and embeddings
         """

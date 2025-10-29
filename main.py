@@ -4,9 +4,11 @@ import os
 from dotenv import load_dotenv
 
 from database.setup_chroma_db import setup_chroma
+from database.db_manager import DbManager
 from ingestion.ingestor import Ingestor
 from ollama_manager.ollama import Ollama
 from embedding.display import Display
+from embedding.embedder import Embedder
 
 # init or connect to Chroma
 from chromadb import PersistentClient
@@ -65,8 +67,10 @@ def main():
             print("Usage: carpet search <query>")
             return
         query = " ".join(sys.argv[2:])
-        # results = search_vector_db(query, collection)
-        print(f"Searching for: {query}")
+        
+        # Create embedder and search
+        embedder = Embedder()
+        results = embedder.search(query)
         return
     
     if command == "db":
@@ -88,6 +92,28 @@ def main():
         else:
             # Default: show all
             display.show_all()
+        return
+    
+    if command == "delete":
+        if len(sys.argv) < 3:
+            print("Usage: carpet delete <filepath>")
+            return
+        
+        filepath = sys.argv[2]
+        
+        # Check if file exists in database first
+        if not DbManager.checkKey(filepath):
+            print(f"❌ File not found in database: {filepath}")
+            return
+        
+        # Delete the file and all its chunks
+        success = DbManager.deleteByFile(filepath)
+        
+        if success:
+            print(f"✅ Successfully deleted {filepath} from database")
+        else:
+            print(f"❌ Failed to delete {filepath}")
+        
         return
 
     print(f"Unknown command: {command}")

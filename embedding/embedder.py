@@ -96,10 +96,9 @@ class Embedder:
             end = start + chunk_size
             chunk = text[start:end]
             
-            if chunk.strip():  # Only add non-empty chunks
+            if chunk.strip(): 
                 chunks.append(chunk)
             
-            # Move start forward by (chunk_size - overlap)
             start += (chunk_size - overlap)
         
         return chunks
@@ -141,5 +140,73 @@ class Embedder:
             self.handlers[ext](file_path)
         else:
             print(f"⚠️  Skipping unsupported file type: {file_path}")
-
-    pass
+    
+    def search(self, query_text: str, n_results: int = 5):
+        """
+        Search for similar documents using vector similarity.
+        
+        Args:
+            query_text: The text query to search for
+            n_results: Number of top results to return (default: 5)
+            
+        Returns:
+            dict: Dictionary containing:
+                - sources: List of unique source file paths
+                - results: Full ChromaDB query results with distances, documents, and metadatas
+        """
+        try:
+            # Get embedding for the query text
+            print(f"🔍 Searching for: {query_text}")
+            query_embedding = self._get_embedding(query_text)
+            
+            # Query ChromaDB for similar vectors
+            results = self.collection.query(
+                query_embeddings=[query_embedding],
+                n_results=n_results
+            )
+            
+            if not results['ids'] or not results['ids'][0]:
+                print("❌ No results found")
+                return {'sources': [], 'results': results}
+            
+            # Extract unique source file paths
+            sources = set()
+            for metadata_list in results['metadatas']:
+                for metadata in metadata_list:
+                    if metadata and 'source' in metadata:
+                        sources.add(metadata['source'])
+            
+            sources_list = list(sources)
+            
+            # Display results
+            print(f"\n✅ Found {len(results['ids'][0])} matching chunks from {len(sources_list)} file(s)")
+            print("=" * 80)
+            
+            for i, doc_id in enumerate(results['ids'][0]):
+                distance = results['distances'][0][i] if results.get('distances') else None
+                document = results['documents'][0][i] if results.get('documents') else None
+                metadata = results['metadatas'][0][i] if results.get('metadatas') else {}
+                
+                source = metadata.get('source', 'Unknown')
+                chunk_idx = metadata.get('chunk_index', 'N/A')
+                
+                print(f"\n🎯 Result #{i+1}")
+                print(f"   Source: {source}")
+                print(f"   Chunk: {chunk_idx}")
+                if distance is not None:
+                    print(f"   Distance: {distance:.4f}")
+                if document:
+                    preview = document[:200].replace('\n', ' ')
+                    print(f"   Preview: {preview}...")
+            
+            print("\n" + "=" * 80)
+            print(f"📁 Relevant files: {', '.join(sources_list)}")
+            
+            return {
+                'sources': sources_list,
+                'results': results
+            }
+            
+        except Exception as e:
+            print(f"❌ Error during search: {e}")
+            return {'sources': [], 'results': None}
