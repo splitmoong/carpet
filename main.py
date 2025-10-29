@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 
 from database.setup_chroma_db import setup_chroma
 from ingestion.ingestor import Ingestor
-from ollama.ollama import Ollama
+from ollama_manager.ollama import Ollama
+from embedding.display import Display
 
 # init or connect to Chroma
 from chromadb import PersistentClient
@@ -26,11 +27,10 @@ HOME = os.path.expanduser("~")
 db_path = os.path.join(HOME, "chroma_store")
 
 if not os.path.exists(db_path) or not os.listdir(db_path):
-    client = setup_chroma(db_path)
+    client, collection = setup_chroma(db_path)
 else:
     client = PersistentClient(path=db_path)
-
-collection = client.get_or_create_collection("user_files")
+    collection = client.get_or_create_collection("user_files")
 
 
 def main():
@@ -67,6 +67,27 @@ def main():
         query = " ".join(sys.argv[2:])
         # results = search_vector_db(query, collection)
         print(f"Searching for: {query}")
+        return
+    
+    if command == "db":
+        display = Display()
+        
+        # Check for subcommands
+        if len(sys.argv) >= 3:
+            subcommand = sys.argv[2].lower()
+            
+            if subcommand == "sources":
+                display.show_sources()
+            elif subcommand == "stats":
+                display.show_stats()
+            elif subcommand == "clear":
+                display.clear_all()
+            else:
+                print(f"Unknown db subcommand: {subcommand}")
+                print("Available: sources, stats, clear")
+        else:
+            # Default: show all
+            display.show_all()
         return
 
     print(f"Unknown command: {command}")

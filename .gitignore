@@ -2,5 +2,6 @@ __pycache__
 /chroma_store
 
 .venv
+venv/
 .idea
 .env
