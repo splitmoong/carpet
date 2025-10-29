@@ -3,6 +3,7 @@ from typing import Callable, List
 import os
 import ollama as ollama_client
 from chromadb import PersistentClient
+from database.db_manager import DbManager
 
 
 class Embedder:
@@ -122,12 +123,23 @@ class Embedder:
     
 
     def embed(self, file_path: str):
+        """
+        Embed a file into ChromaDB. Checks if file already exists before embedding.
+        
+        Args:
+            file_path: Path to the file to embed
+        """
+        # Check if file already exists in ChromaDB
+        if DbManager.checkKey(file_path):
+            print(f"⏭️  Skipping {file_path} - already embedded in database")
+            return
+        
         ext = path.splitext(file_path)[1].lower()
 
         if ext in self.handlers:
+            print(f"📄 Embedding {file_path}...")
             self.handlers[ext](file_path)
         else:
-            print(f"Skipping unsupported file type: {file_path}")
-        pass
+            print(f"⚠️  Skipping unsupported file type: {file_path}")
 
     pass
