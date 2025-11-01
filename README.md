@@ -1,42 +1,25 @@
 # Carpet 
 
-Carpet is a small CLI toolkit to ingest, embed, and search documents locally, with optional integration for the Ollama local LLM manager. It's designed to be simple, flexible, and easy to extend.
+Carpet is a small CLI toolkit to embed, and search documents locally, integrating the Ollama local LLM manager.
 
 ## Features
-- Ingest files from a folder and prepare them for embedding
-- Create and manage a local Chroma vector store
-- Integrate with Ollama to detect, pull, and use local models (e.g. `qllama/bge-m3`)
+- Embed files from a folder (all files reachable).
+- Search for a file with a query, returns top 4 results.
+- Manage a local Chroma vector store, see and delete the embeddings.
+- Integrate with Ollama to detect, pull, and use local model (e.g. `qllama/bge-m3`)
 
-<img alt="Screenshot From 2025-10-27 20-29-47 1" src="https://github.com/user-attachments/assets/d0697754-bc43-45f6-9b37-81585a4f64e2" style="width:100%; height:auto; display:block;" />
-<img alt="Screenshot From 2025-10-27 21-29-10 1" src="https://github.com/user-attachments/assets/01757f3e-e18b-4d3a-83d2-5912c58be738" style="width:100%; height:auto; display:block;" />
+<img width="2109" height="956" alt="Group 1(1)" src="https://github.com/user-attachments/assets/c481204d-f7fa-437a-a9bc-335977982d18" />
+<img width="2109" height="831" alt="Screenshot From 2025-11-01 12-56-47 1" src="https://github.com/user-attachments/assets/b4a840cd-9947-4e57-99bb-bf91beb0ee83" />
+<img width="2111" height="833" alt="Screenshot From 2025-11-01 13-02-53 1" src="https://github.com/user-attachments/assets/100c7ae0-5c02-4f51-a16e-a26ac3aa51d6" />
+<img width="2111" height="596" alt="Group 2(1)" src="https://github.com/user-attachments/assets/354b7d09-b2e2-4718-b639-6f7801a10d50" />
 
 ## Installation
-
-1. Create a virtual environment (recommended):
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-2. Install dependencies (if a `requirements.txt` exists):
-
-```bash
-pip install -r requirements.txt
-```
-
-If you don't have a `requirements.txt`, the project requires the usual packages used here such as `chromadb` — check the `requirements.txt` from your collaborator or add the dependencies you need.
-
-3. Create a Syslink
-
-If you want to call the project as a single command (`carpet`) from any folder, create a small symlink or wrapper in a directory on your PATH. Below are safe, copy-pasteable options for Linux/macOS and Windows.
 
 Linux / MacOS
 
 ```bash
-# from the project root
-chmod +x main.py
-sudo ln -s /full/path/to/your/repo/main.py /usr/local/bin/carpet
+chmod +x script.sh
+./script.sh
 ```
 
 Windows 
@@ -48,7 +31,7 @@ You can create a symlink with `mklink` in an elevated prompt or with Developer M
 mklink "C:\Users\YourName\bin\carpet.py" "C:\full\path\to\repo\main.py"
 ```
 
-This approach is less portable and often unnecessary — the wrapper `.bat` is simpler and works reliably.
+(will add a script.bat in future which will work same as script.sh)
 
 ## Usage
 
@@ -66,4 +49,9 @@ Commands
 
 - `embed` — Walk the current working directory, ingest files and prepare embeddings. The command will print how many files were found to embed.
 
-- `search <query>` — (Planned) run a vector search against the local Chroma collection.
+- `search "query"` — Run a vector search against the local Chroma collection and return top 4 similar files.
+
+- `db` — See all the filepaths and their chunks in ChromaDb.
+
+- `delete "filepath"` — Delete the embedding of a file from ChromaDb.
+

@@ -23,11 +23,16 @@ class Display:
             results = self.collection.get()
             
             if not results['ids']:
-                print("\n📦 ChromaDB is empty. No documents found.")
+                print("📦 ChromaDB is empty. No documents found.")
                 return
             
             total_docs = len(results['ids'])
-            print(f"\n📊 ChromaDB Contents ({total_docs} chunks)")
+            # Compute total unique source files (if metadata is present)
+            total_files = 0
+            if results.get('metadatas'):
+                total_files = len({m.get('source', 'Unknown') for m in results['metadatas'] if m})
+
+            print(f"📊 ChromaDB Contents ({total_files} files, {total_docs} chunks)")
             print("=" * 80)
             
             # Group by source file

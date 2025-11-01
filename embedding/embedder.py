@@ -52,7 +52,8 @@ class Embedder:
             overlap: Number of characters to overlap between chunks
         """
         chunks = self._create_overlapping_chunks(text, chunk_size, overlap)
-        print(f"Created {len(chunks)} chunks from {source_file}")
+        temp = source_file.split("/")
+        print(f"Created {len(chunks)} chunks from {temp[len(temp)-1]}")
         
         #get embeddings for each chunk
         for i, chunk in enumerate(chunks):
