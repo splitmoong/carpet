@@ -17,8 +17,8 @@ class Embedder:
         # initialize ChromaDB client
         home = os.path.expanduser("~")
         
-        # check if CHROMA_PATH is in .env, otherwise use default
-        chroma_path = os.getenv("CHROMA_PATH", os.path.join(home, "chroma_store"))
+        # Use fixed chroma store path (no environment lookup)
+        chroma_path = os.path.join(home, "chroma_store")
         if not chroma_path.startswith("/"):
             chroma_path = os.path.join(home, chroma_path.lstrip("./"))
         

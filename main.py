@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import os
-from dotenv import load_dotenv
 
 from database.setup_chroma_db import setup_chroma
 from database.db_manager import DbManager
@@ -15,7 +14,7 @@ from chromadb import PersistentClient
 
 # from search_db import search_vector_db
 
-load_dotenv()
+# dotenv removed: no environment file loading required
 
 import logging
 

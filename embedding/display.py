@@ -8,7 +8,8 @@ class Display:
     def __init__(self):
         """Initialize ChromaDB client."""
         home = os.path.expanduser("~")
-        chroma_path = os.getenv("CHROMA_PATH", os.path.join(home, "chroma_store"))
+        # Use fixed chroma store path instead of reading from environment
+        chroma_path = os.path.join(home, "chroma_store")
         if not chroma_path.startswith("/"):
             chroma_path = os.path.join(home, chroma_path.lstrip("./"))
         

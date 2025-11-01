@@ -1,9 +1,7 @@
 import os
 from chromadb import PersistentClient
-from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
 
 class DbManager:
     """static class for managing ChromaDB operations."""
@@ -16,8 +14,9 @@ class DbManager:
         """Initialize and return ChromaDB client (singleton pattern)."""
         if DbManager._client is None:
             home = os.path.expanduser("~")
-            chroma_path = os.getenv("CHROMA_PATH", "chroma_store")
-            
+            # Use a fixed chroma store path (no dotenv/env lookup)
+            chroma_path = "chroma_store"
+
             # If relative path, make it relative to home directory
             if not chroma_path.startswith("/"):
                 chroma_path = os.path.join(home, chroma_path)
